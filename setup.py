@@ -1,4 +1,4 @@
-from setuptools import setup, Extension
+from setuptools import setup
 
 setup(
     name='django-postpone-index',
@@ -15,6 +15,7 @@ setup(
     },
     long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type='text/markdown',
+    install_requires=['django2-postgres-backport', 'django-unlimited-char'],
     classifiers=[
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.10',
@@ -23,6 +24,17 @@ setup(
         'Programming Language :: Python :: 3.13',
         'Programming Language :: Python :: 3.14',
         'Programming Language :: Python :: 3.15',
+        'Framework :: Django',
+        'Framework :: Django :: 2.2',
+        'Framework :: Django :: 3.0',
+        'Framework :: Django :: 3.1',
+        'Framework :: Django :: 3.2',
+        'Framework :: Django :: 4.0',
+        'Framework :: Django :: 4.1',
+        'Framework :: Django :: 4.2',
+        'Framework :: Django :: 5.0',
+        'Framework :: Django :: 5.1',
+        'Framework :: Django :: 5.2',
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',

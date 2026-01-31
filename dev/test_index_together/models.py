@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class IndexTogether1(models.Model):
     """Single migration with index_together"""
 

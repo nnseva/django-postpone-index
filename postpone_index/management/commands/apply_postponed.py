@@ -2,17 +2,16 @@
 The apply_postponed command applies collected postponed index and constraint creation
 in CONCURRENTLY manner.
 """
-import sys
-import os.path
-import re
 import argparse
 import logging
+import sys
 
-from django.core.management.base import BaseCommand, CommandError, CommandParser
-from django.db import connections, transaction, DatabaseError
+from django.core.management.base import BaseCommand
+from django.db import connections
 
 from postpone_index.models import PostponedSQL
 from postpone_index.utils import ObjMap, Utils
+
 
 logger = logging.getLogger(__name__)
 
@@ -184,8 +183,8 @@ Additional names are:
         """Handle a single job for the run command"""
         if match := self._create_index_re.fullmatch(job.sql):
             unique = match.group('unique') or ''
-            index_name = match.group('index_nameq') or match_group('index_name')
-            table_name = match.group('table_nameq') or match_group('table_name')
+            index_name = match.group('index_nameq') or match.group('index_name')
+            table_name = match.group('table_nameq') or match.group('table_name')
             rest = match.group('rest')
             sql = 'DROP INDEX IF EXISTS "%s"' % (
                 index_name,
@@ -205,9 +204,9 @@ Additional names are:
             cursor.execute(sql)
             cursor.close()
         elif match := self._add_constraint_re.fullmatch(job.sql):
-            unique ='UNIQUE '
-            index_name = match.group('index_nameq') or match_group('index_name')
-            table_name = match.group('table_nameq') or match_group('table_name')
+            unique = 'UNIQUE '
+            index_name = match.group('index_nameq') or match.group('index_name')
+            table_name = match.group('table_nameq') or match.group('table_name')
             rest = match.group('rest')
             sql = 'ALTER TABLE "%s" DROP CONSTRAINT IF EXISTS "%s"' % (
                 table_name,

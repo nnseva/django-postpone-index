@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class UniqueTogether1(models.Model):
     """Single migration with unique_together"""
 

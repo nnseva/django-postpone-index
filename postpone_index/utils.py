@@ -1,20 +1,22 @@
 """Some utilities"""
 
-from collections.abc import MappingView
 import re
+from collections.abc import MappingView
 
 
 class ObjMap(MappingView):
     """Gives access to any attribute using map protocol, combining with another map for defaults"""
+
     def __init__(self, obj, defaults=None):
         """Initialize by the original object"""
         self._obj = obj
         self._defaults = defaults or {}
+
     def __getitem__(self, k):
         """Override to get access"""
         try:
             return getattr(self._obj, k)
-        except AttributeError as ex:
+        except AttributeError:
             return self._defaults[k]
 
 
@@ -73,6 +75,7 @@ class Utils:
         r'\((?P<enclosed>[^\(\)]*)\)',
         re.IGNORECASE | re.MULTILINE
     )
+
     @classmethod
     def _extract_column_names(cls, rest):
         """Extracts column names from complex index suffix"""

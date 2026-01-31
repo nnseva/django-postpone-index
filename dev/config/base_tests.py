@@ -1,18 +1,11 @@
 """Base module test with base migration tests"""
 
-import copy
-import json
-
-from django.conf import settings
-from django.core.management import call_command
-from django.test import override_settings
-from django.utils import timezone
-
-from postpone_index.models import PostponedSQL
-from postpone_index import testing_utils
-
 from django.apps import apps
+from django.core.management import call_command
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.test import override_settings
+
+from postpone_index import testing_utils
 
 
 class TestCase(testing_utils.TestCase):

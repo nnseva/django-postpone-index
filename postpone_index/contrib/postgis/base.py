@@ -4,6 +4,7 @@ from django.contrib.gis.db.backends.postgis.base import (
 
 from postpone_index.contrib.postgres.schema import DatabaseSchemaEditor
 
+
 class DatabaseWrapper(_DatabaseWrapper):
     """Database wrapper"""
 

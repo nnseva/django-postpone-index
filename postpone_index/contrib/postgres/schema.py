@@ -1,23 +1,18 @@
 """Schema editor with concurrent index creation support."""
+import logging
 import os
 import os.path
-import logging
 
 from django.conf import settings
 from django.db.backends.postgresql.schema import (
     DatabaseSchemaEditor as _DatabaseSchemaEditor,
 )
-from django.db.utils import ProgrammingError
 
 from postpone_index.utils import Utils
 
 
 logger = logging.getLogger(__name__)
 package_folder = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-
-class InvalidIndexError(Exception):
-    """Raised when a concurrent index creation results in an invalid index."""
-    pass
 
 
 class DatabaseSchemaEditorMixin(Utils):
@@ -77,7 +72,7 @@ class DatabaseSchemaEditorMixin(Utils):
                 columns
             )
             PostponedSQL.objects.using(self.connection.alias).create(
-                sql = str(sql),
+                sql=str(sql),
                 description=description,
                 table=table_name,
                 db_index=index_name,
@@ -95,7 +90,7 @@ class DatabaseSchemaEditorMixin(Utils):
                 columns,
             )
             PostponedSQL.objects.using(self.connection.alias).create(
-                sql = str(sql),
+                sql=str(sql),
                 description=description,
                 table=table_name,
                 db_index=index_name,
@@ -229,6 +224,7 @@ class DatabaseSchemaEditorMixin(Utils):
             logger.info('[%s] Delete composed %s on %s success', self.connection.alias, index_name, model._meta.db_table)
         except Exception as ex:
             logger.info('[%s] Delete composed %s on %s ignored: %s', self.connection.alias, index_name, model._meta.db_table, ex)
+
 
 class DatabaseSchemaEditor(DatabaseSchemaEditorMixin, _DatabaseSchemaEditor):
     pass

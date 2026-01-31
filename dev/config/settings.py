@@ -7,6 +7,10 @@ import os
 import sys
 
 from django2_postgres import psycopg_patch
+
+import django
+
+
 psycopg_patch.fix()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -30,9 +34,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'config',
-    'test_index_together',
     'test_unique_together',
     'test_fields',
     'test_explicit_constraint',
@@ -45,7 +48,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-)
+]
+
+if django.VERSION < (5, 1):
+    INSTALLED_APPS.insert(1, 'test_index_together')
 
 MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
@@ -131,7 +137,7 @@ LOGGING = {
         # Again, default Django configuration to email unhandled exceptions
         'django.db': {
             'handlers': ['console'],
-            'level':  os.environ.get('DATABASE_LOGGING', 'INFO'),
+            'level': os.environ.get('DATABASE_LOGGING', 'INFO'),
             'propagate': False,
         },
         'root': {

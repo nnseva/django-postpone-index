@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class UniqueField1(models.Model):
     """Sequential migrations with unique field"""
 

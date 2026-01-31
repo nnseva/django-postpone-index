@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postpone_index.models import PostponedSQL
 
+
 class PostponedSQLAdminMixin:
     list_display = ('d', 'description', 'table', 'db_index')
     list_display_links = ('d', 'description')

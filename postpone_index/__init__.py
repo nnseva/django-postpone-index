@@ -1,3 +1,4 @@
-from ._version import __version__
+from ._version import *  # noqa
+
 
 default_app_config = 'postpone_index.apps.Config'

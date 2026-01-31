@@ -4,6 +4,7 @@ from django.db.backends.postgresql.base import (
 
 from postpone_index.contrib.postgres.schema import DatabaseSchemaEditor
 
+
 class DatabaseWrapper(_DatabaseWrapper):
     """Database wrapper"""
 

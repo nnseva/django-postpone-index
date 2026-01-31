@@ -1,9 +1,10 @@
 """Module Tests"""
 
-from postpone_index import testing_utils
-
 from django.core.management import call_command
 from django.test import override_settings
+
+from postpone_index import testing_utils
+
 
 class ModuleTest(testing_utils.TestCase):
     __doc__ = __doc__

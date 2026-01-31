@@ -1,5 +1,6 @@
 """Utility for special migration cases"""
 
+
 class PostponeIndexIgnoreMigrationMixin:
     """Migration class mixin to avoid postpone index"""
 

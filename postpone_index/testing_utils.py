@@ -1,9 +1,7 @@
 """Testing Utilities"""
 
 from django.conf import settings
-from django.core.management import call_command
-from django.test import TransactionTestCase, override_settings
-from django.utils import timezone
+from django.test import TransactionTestCase
 
 from postpone_index.models import PostponedSQL
 
