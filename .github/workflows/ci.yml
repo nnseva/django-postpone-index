@@ -86,29 +86,12 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade tox
 
-      - name: Install PostgreSQL client
+      - name: Install GDAL/GEOS (for PostGIS tests)
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql-client gdal-bin libgdal-dev libgeos-dev
-
-      - name: Prepare test databases
-        env:
-          PGPASSWORD: test
-        run: |
-          until pg_isready -h 127.0.0.1 -p 5432 -U test -d postpone_index; do sleep 1; done
-          createdb -h 127.0.0.1 -p 5432 -U test postpone_index_additional
-        #   psql -h 127.0.0.1 -p 5432 -U test -d postpone_index -c "CREATE EXTENSION IF NOT EXISTS postgis;"
-        #   psql -h 127.0.0.1 -p 5432 -U test -d postpone_index_additional -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+          sudo apt-get install -y gdal-bin libgdal-dev libgeos-dev
 
       - name: Run tox
-        # env:
-        #   DATABASE_HOST: 127.0.0.1
-        #   DATABASE_PORT: "5432"
-        #   DATABASE_USER: test
-        #   DATABASE_PASSWORD: test
-        #   DATABASE_NAME: postpone_index
-        #   DATABASE_NAME_ADDITIONAL: postpone_index_additional
-        #   POSTPONE_INDEX_IGNORE: "True"
         run: |
           tox run -f ${{ matrix.tox_factor }}
 
