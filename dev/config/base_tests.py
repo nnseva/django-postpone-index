@@ -30,14 +30,20 @@ class TestCase(testing_utils.TestCase):
             POSTPONE_INDEX_IGNORE=True
         ):
             call_command('migrate', self.module_name, 'zero')
+            call_command('migrate', self.module_name, 'zero', '--database=additional')
         with override_settings(
             POSTPONE_INDEX_IGNORE=False
         ):
             call_command('migrate', self.module_name)
-            self.assertTrue(not self._check_postponed_sql_empty(), 'No Postponed SQL after migrations')
+            call_command('migrate', self.module_name, '--database=additional')
+            self.assertTrue(not self._check_postponed_sql_empty(alias='default'), 'No Postponed SQL after migrations')
+            self.assertTrue(not self._check_postponed_sql_empty(alias='additional'), 'No Postponed SQL after migrations')
             call_command('apply_postponed', 'run', '-x')
+            call_command('apply_postponed', 'run', '-x', '--database=additional')
             call_command('apply_postponed', 'cleanup')
-            self._assert_postponed_sql_empty()
+            call_command('apply_postponed', 'cleanup', '--database=additional')
+            self._assert_postponed_sql_empty(alias='default')
+            self._assert_postponed_sql_empty(alias='additional')
 
     def test_001_migrate_step_by_step(self):
         """Test migrations step by step"""

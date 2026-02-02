@@ -53,6 +53,8 @@ INSTALLED_APPS = [
 if django.VERSION < (5, 1):
     INSTALLED_APPS.insert(1, 'test_index_together')
 
+TEST_RUNNER = 'config.utils.DjangoDiscoverRunner'
+
 MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

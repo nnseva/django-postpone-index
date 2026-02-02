@@ -10,9 +10,9 @@ class TestCase(TransactionTestCase):
     """Base module testcase class"""
 
     @staticmethod
-    def _check_postponed_sql_empty():
+    def _check_postponed_sql_empty(alias='default'):
         try:
-            first = PostponedSQL.objects.all().first()
+            first = PostponedSQL.objects.using(alias).all().first()
             if not first:
                 # No record
                 return True
@@ -22,8 +22,8 @@ class TestCase(TransactionTestCase):
         return False
 
     @classmethod
-    def _assert_postponed_sql_empty(cls, message=None):
-        cls.assertTrue(cls._check_postponed_sql_empty(), message or 'Postponed SQL list not empty')
+    def _assert_postponed_sql_empty(cls, message=None, alias='default'):
+        cls.assertTrue(cls._check_postponed_sql_empty(alias=alias), message or 'Postponed SQL list not empty')
 
     @classmethod
     def setUpClass(cls):
@@ -31,5 +31,7 @@ class TestCase(TransactionTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        if not cls._check_postponed_sql_empty():
-            PostponedSQL.objects.all().delete()
+        if not cls._check_postponed_sql_empty(alias='default'):
+            PostponedSQL.objects.using('default').all().delete()
+        if not cls._check_postponed_sql_empty(alias='additional'):
+            PostponedSQL.objects.using('additional').all().delete()

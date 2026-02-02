@@ -14,6 +14,7 @@ htmlcov/
 .svn/
 .tox/
 .vscode/
+.venv/
 .clangd
 __pycache__/
 .ropeproject
