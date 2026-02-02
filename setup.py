@@ -49,5 +49,15 @@ setup(
         'postgresql',
     ],
     license='LGPLv3',
-    packages=['postpone_index'],
+    packages=[
+        'postpone_index',
+        'postpone_index/contrib',
+        'postpone_index/contrib/postgres',
+        'postpone_index/contrib/postgis',
+        'postpone_index/management',
+        'postpone_index/management/commands',
+    ],
+    package_data={
+        'postpone_index': ['sql/start.sql'],
+    },
 )
