@@ -124,11 +124,6 @@ LOGGING = {
         }
     },
     'loggers': {
-        'postpone_index.contrib.postgres.schema': {
-            'handlers': ['console'],
-            'level': os.environ.get('POSTPONE_INDEX_LOGGING', 'INFO'),
-            'propagate': False,
-        },
         'postpone_index': {
             'handlers': ['console'],
             'level': os.environ.get('POSTPONE_INDEX_LOGGING', 'INFO'),
@@ -139,7 +134,6 @@ LOGGING = {
             'level': os.environ.get('CONFIG_LOGGING', 'INFO'),
             'propagate': False,
         },
-        # Again, default Django configuration to email unhandled exceptions
         'django.db': {
             'handlers': ['console'],
             'level': os.environ.get('DATABASE_LOGGING', 'INFO'),

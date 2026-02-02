@@ -25,20 +25,10 @@ class DatabaseSchemaEditorMixin(Utils):
         """
         if self._base_tables_created:
             return
-
         # Avoid circular import
         from postpone_index.models import PostponedSQL
 
-        cursor = self.connection.cursor()
-        cursor.execute("SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '%s' limit 1" % PostponedSQL._meta.db_table)
-        if cursor.fetchall():
-            self._base_tables_created = True
-            logger.debug('[%s] The PostponedSQL storage already exists', self.connection.alias)
-            return
-        logger.info('[%s] The PostponedSQL storage is absent, creating', self.connection.alias)
-        with open(os.path.join(package_folder, 'sql/start.sql')) as f:
-            sql = f.read()
-        cursor.execute(sql)
+        PostponedSQL.objects.using(self.connection.alias)._create_base_tables()
         self._base_tables_created = True
 
     def _ignore(self):

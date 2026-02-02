@@ -120,6 +120,43 @@ calling the `apply_postponed` migration command again. All not-applied indexes w
 **NOTICE** the `apply_postponed` management command doesn't have any explicit locking mechanics. Avoid starting this
 command concurrently with itself or another `migrate` command on the same database.
 
+## Intermediate migration state
+
+Apart from standard Django migrations, using the `postpone_index` package leads to the *intermediate migration state*
+after the `migrate` management command finished:
+
+- new model structure is applied
+- indexes to be deleted are deleted
+- indexes to be created are *not created yet*
+
+You should be aware that if you introduce a new unique index or constraint, the database does not control uniqueness
+based on not yet created indexes at this time.
+
+Your code works now as expected everywhere, except the code which is based on new unique constraints introduced in applied migrations.
+
+Apply the `apply_postponed run` management command to make these new indexes work.
+
+Any error while `apply_postponed run` execution is stored in the `PostponedSQL` model instance.
+
+You can see erroneous lines using `apply_postponed list` command. See the `[E]` mark at the start of the line.
+
+You also can see the error details using the format parameter of the `apply_postponed list -f '... %(error)s'` management command.
+
+The `apply_postponed run -x` breaks execution on any error. You can see the error in the standard error or logging streams.
+
+The `apply_postponed run` (without `-x` parameter) doesn't stop on error, but outputs warning to the log stream instead.
+
+When the error happened, it most probably is caused by the non-unique records. Fix the data and try to execute
+`apply_postponed run` again to create an index.
+
+After the successfull `apply_postponed run` execution, the migration state is finalised to be equal as if you applied the migration
+without `postpone_index` package at all.
+
+The `apply_postponed run` management command marks all successfully executed `PostponedSQL` instances as `done`. You can see `[X]` mark
+at the start of the line produced by `apply_ponsponed list` management command.
+
+You can cleanup `done` instances using `apply_postponed cleanup` management command. This step is optional.
+
 ## Django testing
 
 Django migrates testing database before tests. Always use `POSTPONE_INDEX_IGNORE = True` settings to avoid postpone index

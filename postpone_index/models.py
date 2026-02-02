@@ -1,12 +1,78 @@
+import logging
+import os
 import time
 
 from unlimited_char.fields import CharField
 
-from django.db import models
+from django.db import models, connections
 from django.utils.translation import gettext_lazy as _
+
+logger = logging.getLogger(__name__)
+package_folder = os.path.dirname(os.path.abspath(__file__))
+
+
+class PostponedSQLQuerySet(models.QuerySet):
+    """
+    QuerySet for PostponedSQL model.
+
+    Redefined for admin view when table is absent.
+    """
+
+    def _create_base_tables(self):
+        """
+        Create base package table if absent
+        """
+        if self._is_present():
+            logger.debug('[%s] The PostponedSQL storage already exists', self.db)
+            return
+        logger.info('[%s] The PostponedSQL storage is absent, creating', self.db)
+        with open(os.path.join(package_folder, 'sql/start.sql')) as f:
+            sql = f.read()
+        cursor = connections[self.db].cursor()
+        cursor.execute(sql)
+
+    def count(self):
+        """
+        Count only if table is present
+        """
+        if not self._is_present():
+            return 0
+        return super().count()
+
+    def _is_present(self):
+        """
+        Check if table is present
+        """
+        cursor = connections[self.db].cursor()
+        cursor.execute(
+            """
+                SELECT 1 FROM information_schema.tables
+                WHERE table_schema = 'public' AND table_name = '%s' limit 1
+            """ % PostponedSQL._meta.db_table
+        )
+        return bool(cursor.fetchall())
+
+
+class PostponedSQLManager(models.Manager):
+    """
+    Manager for PostponedSQL model.
+
+    Redefined for admin view when table is absent.
+    """
+
+    def get_queryset(self):
+        """
+        Get custom QuerySet
+        """
+        qs = PostponedSQLQuerySet(self.model, using=self._db)
+        if not qs._is_present():
+            return qs.none()
+        return qs
 
 
 class PostponedSQL(models.Model):
+    """Model to store postponed SQL commands"""
+
     ts = models.BigIntegerField(
         primary_key=True, editable=False,
         default=time.time_ns,
@@ -46,6 +112,8 @@ class PostponedSQL(models.Model):
         verbose_name=_('Error'),
         help_text=_('Last error reported when tried to apply')
     )
+
+    objects = PostponedSQLManager()
 
     @property
     def d(self):
