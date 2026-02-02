@@ -53,6 +53,9 @@ INSTALLED_APPS = [
 if django.VERSION < (5, 1):
     INSTALLED_APPS.insert(1, 'test_index_together')
 
+if 'postgis' in (os.environ.get('DATABASE_ENGINE') or ''):
+    INSTALLED_APPS.insert(1, 'test_gis_index')
+
 TEST_RUNNER = 'config.utils.DjangoDiscoverRunner'
 
 MIDDLEWARE = (

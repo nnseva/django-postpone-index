@@ -66,7 +66,7 @@ class Command(Utils, BaseCommand):
             '-f', '--format',
             dest='format',
             default='s',
-            help=f'''Output format. Use either:
+            help=f"""Output format. Use either:
     - `s` for short SQL-only format `{self._short_format}` (default)
     - `d` for enumerated descriptions format `{self._descr_format}`
     - `l` for enumerated SQL format `{self._long_format}`
@@ -74,7 +74,7 @@ class Command(Utils, BaseCommand):
 Use the PostponedSQL field names for %-style format.
 Additional names are:
     - `i` for enumeration index
-    - `d` for the `done` attribute in form of `+` or `-`'''.replace('%', '%%')
+    - `d` for the `done` attribute in form of `+` or `-`""".replace('%', '%%')
         )
         run = subparsers.add_parser(
             name='run',
