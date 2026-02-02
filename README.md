@@ -1,3 +1,5 @@
+[![Tests](https://github.com/nnseva/django-postpone-index/actions/workflows/ci.yml/badge.svg)](https://github.com/nnseva/django-postpone-index/actions/workflows/ci.yml)
+
 # Django Postpone Index
 
 This package provides modules and tools to postpone any index creation instead doing it inside the migration,
@@ -5,6 +7,18 @@ to provide *Zero Downtime Migration* feature.
 
 The package is now using the PostgresSQL-specific `CREATE INDEX CONCURRENTLY` SQL command, so is applicable
 only to the PostgreSQL backend.
+
+## Installation
+
+*Stable version* from the PyPi package repository
+```bash
+pip install django-postpone-index
+```
+
+*Last development version* from the GitHub source version control system
+```
+pip install git+git://github.com/nnseva/django-postpone-index.git
+```
 
 ## Problem Description
 
@@ -69,11 +83,30 @@ DATABASES = {
 If you provide your own database engine instead of the Django-provided, you can also
 combine `pospone_index.contrib.postgres.schema.DatabaseSchemaEditorMixin` with your own Database Schema Editor, f.e.:
 
+`mybackend/schema.py`
 ```python
 from django.db.backends.postgresql.schema import DatabaseSchemaEditor as _DatabaseSchemaEditor
 from pospone_index.contrib.postgres.schema import DatabaseSchemaEditorMixin
 
-class DatabaseSchemaEditor(DatabaseSchemaEditorMixin, _DatabaseSchemaEditor):
+class PostponeIndexDatabaseSchemaEditor(DatabaseSchemaEditorMixin, _DatabaseSchemaEditor):
+    # Your own code
+    ...
+```
+
+`mybackend/base.py`
+```python
+from django.db.backends.postgresql.base import (
+    DatabaseWrapper as _DatabaseWrapper,
+)
+
+from mybackend.schema import PostponeIndexDatabaseSchemaEditor
+
+
+class DatabaseWrapper(_DatabaseWrapper):
+    """Database wrapper"""
+
+    SchemaEditorClass = PostponeIndexDatabaseSchemaEditor
+    # Your own code
     ...
 ```
 
