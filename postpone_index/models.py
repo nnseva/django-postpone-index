@@ -4,8 +4,9 @@ import time
 
 from unlimited_char.fields import CharField
 
-from django.db import models, connections
+from django.db import connections, models
 from django.utils.translation import gettext_lazy as _
+
 
 logger = logging.getLogger(__name__)
 package_folder = os.path.dirname(os.path.abspath(__file__))
