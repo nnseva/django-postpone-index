@@ -118,7 +118,7 @@ class DatabaseSchemaEditorMixin(Utils):
                     logger.info('[%s] Removed all indexes on table %s from postponed', self.connection.alias, table_name)
                 return super().execute(sql, params)
             elif match := self._drop_column_re.fullmatch(str(sql)):
-                # Table dropped cancels all postponed operations related
+                # Column dropped cancels all postponed operations related
                 table_name = match.group('table_nameq') or match.group('table_name')
                 column_name = match.group('column_nameq') or match.group('column_name')
                 if PostponedSQL.objects.using(self.connection.alias).filter(
@@ -128,6 +128,37 @@ class DatabaseSchemaEditorMixin(Utils):
                         '[%s] Removed all indexes on column %s of table %s from postponed',
                         self.connection.alias, column_name, table_name
                     )
+                return super().execute(sql, params)
+            elif match := self._rename_column_re.fullmatch(str(sql)):
+                # Rename column changes the postponed indexes to alter SQL but not the index name
+                table_name = match.group('table_nameq') or match.group('table_name')
+                column_name = match.group('column_nameq') or match.group('column_name')
+                ncolumn_name = match.group('ncolumn_nameq') or match.group('ncolumn_name')
+                for postponed_sql in PostponedSQL.objects.using(self.connection.alias).filter(
+                    table=table_name, fields__contains='"%s"' % column_name, done=False
+                ):
+                    logger.info(
+                        '[%s] Reformat index %s SQL to rename column %s to %s of table %s from postponed',
+                        self.connection.alias, postponed_sql.db_index, column_name, ncolumn_name, table_name,
+                    )
+                    postponed_sql.sql = postponed_sql.sql.replace('"%s"' % column_name, '"%s"' % ncolumn_name)
+                    postponed_sql.fields = postponed_sql.fields.replace('"%s"' % column_name, '"%s"' % ncolumn_name)
+                    postponed_sql.save(update_fields=['sql', 'fields'])
+                return super().execute(sql, params)
+            elif match := self._rename_table_re.fullmatch(str(sql)):
+                # Rename table changes the postponed indexes to alter SQL and table name but not anything other
+                table_name = match.group('table_nameq') or match.group('table_name')
+                ntable_name = match.group('ntable_nameq') or match.group('ntable_name')
+                for postponed_sql in PostponedSQL.objects.using(self.connection.alias).filter(
+                    table=table_name, done=False
+                ):
+                    logger.info(
+                        '[%s] Reformat index %s SQL to rename table %s to %s from postponed',
+                        self.connection.alias, postponed_sql.db_index, table_name, ntable_name,
+                    )
+                    postponed_sql.sql = postponed_sql.sql.replace('"%s"' % table_name, '"%s"' % ntable_name)
+                    postponed_sql.table = ntable_name
+                    postponed_sql.save(update_fields=['sql', 'table'])
                 return super().execute(sql, params)
             else:
                 logger.debug('[%s] No special statements: %s', self.connection.alias, sql)

@@ -2,10 +2,24 @@
 
 from django.apps import apps
 from django.core.management import call_command
-from django.db import DEFAULT_DB_ALIAS, connections
+from django.db import DEFAULT_DB_ALIAS, connection, connections
+from django.db.migrations.loader import MigrationLoader
 from django.test import override_settings
 
 from postpone_index import testing_utils
+
+
+def _list_migrations(app_name):
+    """Lists all module migrations"""
+
+    loader = MigrationLoader(connection, ignore_no_migrations=True)
+    graph = loader.graph
+    ret = []
+    for node in graph.leaf_nodes(app_name):
+        for plan_node in graph.forwards_plan(node):
+            if plan_node[0] == app_name:
+                ret.append(plan_node[1])
+    return ret
 
 
 class TestCase(testing_utils.TestCase):
@@ -14,7 +28,11 @@ class TestCase(testing_utils.TestCase):
     maxDiff = None
 
     module_name = None  # Replace in child to the name of the module to test
-    migrations = None  # Replace in child to the list of migrations to test
+
+    @property
+    def migrations(self):
+        """All module migrations"""
+        return _list_migrations(self.module_name)
 
     @classmethod
     def setUpClass(cls):
@@ -71,14 +89,18 @@ class TestCase(testing_utils.TestCase):
     def test_002_migrate_equaliry(self):
         """Test and compare migrations with and without postpone index using introspection"""
 
+        # Baseline: default settings (tests run with POSTPONE_INDEX_IGNORE=True).
+        call_command('migrate', self.module_name, 'zero')
+
+        migration_before = 'zero'
+
         for migration_id in self.migrations:
-            # Baseline: default settings (tests run with POSTPONE_INDEX_IGNORE=True).
-            call_command('migrate', self.module_name, 'zero')
+            # Store introspection
             call_command('migrate', self.module_name, migration_id)
             baseline = self.introspect_app_schema(self.module_name)
+            call_command('migrate', self.module_name, migration_before)
 
             # With postpone_index enabled.
-            call_command('migrate', self.module_name, 'zero')
             with override_settings(POSTPONE_INDEX_IGNORE=False):
                 call_command('migrate', self.module_name, migration_id)
                 call_command('apply_postponed', 'run', '-x')
@@ -93,6 +115,7 @@ class TestCase(testing_utils.TestCase):
                     migration_id,
                 ),
             )
+            migration_before = migration_id
 
     @staticmethod
     def _field_info_to_dict(field_info):

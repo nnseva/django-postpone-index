@@ -26,7 +26,7 @@ class Utils:
         r'^\s*CREATE\s+(?P<unique>UNIQUE\s+)?INDEX\s+(IF\s+NOT\s+EXISTS\s+)?'
         r'(((?P<iq>")?(?P<index_nameq>[^"]+)(?P=iq))|(?P<index_name>[^\s]+))'
         r'\s+ON\s+(?P<only>ONLY\s+)?'
-        r'(((?P<tq>")?(?P<table_nameq>[^"]+)(?P=tq))|(?P<table_name>[^\s]+))'
+        r'(("?)public("?)\.)?(((?P<tq>")?(?P<table_nameq>[^"]+)(?P=tq))|(?P<table_name>[_a-zA-Z0-9]+))'
         r'(?P<rest>.*)$',
         re.IGNORECASE | re.MULTILINE
     )
@@ -38,13 +38,13 @@ class Utils:
     )
     _drop_table_re = re.compile(
         r'^\s*DROP\s+TABLE\s+(IF\s+EXISTS\s+)?'
-        r'(((?P<tq>")?(?P<table_nameq>[^"]+)(?P=tq))|(?P<table_name>[^\s]+))'
+        r'(("?)public("?)\.)?(((?P<tq>")?(?P<table_nameq>[^"]+)(?P=tq))|(?P<table_name>[_a-zA-Z0-9]+))'
         r'(?P<rest>.*)$',
         re.IGNORECASE | re.MULTILINE
     )
     _add_constraint_re = re.compile(
         r'^\s*ALTER\s+TABLE\s+'
-        r'(((?P<tq>")?(?P<table_nameq>[^"]+)(?P=tq))|(?P<table_name>[^\s]+))'
+        r'(("?)public("?)\.)?(((?P<tq>")?(?P<table_nameq>[^"]+)(?P=tq))|(?P<table_name>[_a-zA-Z0-9]+))'
         r'\s+ADD\s+CONSTRAINT\s+'
         r'(((?P<iq>")?(?P<index_nameq>[^"]+)(?P=iq))|(?P<index_name>[^\s]+))'
         r'\s+UNIQUE\s+'
@@ -53,7 +53,7 @@ class Utils:
     )
     _drop_constraint_re = re.compile(
         r'^\s*ALTER\s+TABLE\s+'
-        r'(((?P<tq>")?(?P<table_nameq>[^"]+)(?P=tq))|(?P<table_name>[^\s]+))'
+        r'(("?)public("?)\.)?(((?P<tq>")?(?P<table_nameq>[^"]+)(?P=tq))|(?P<table_name>[_a-zA-Z0-9]+))'
         r'\s+DROP\s+CONSTRAINT\s+'
         r'(((?P<iq>")?(?P<index_nameq>[^"]+)(?P=iq))|(?P<index_name>[^\s]+))'
         r'(?P<rest>.*)$',
@@ -61,9 +61,27 @@ class Utils:
     )
     _drop_column_re = re.compile(
         r'^\s*ALTER\s+TABLE\s+'
-        r'(((?P<tq>")?(?P<table_nameq>[^"]+)(?P=tq))|(?P<table_name>[^\s]+))'
+        r'(("?)public("?)\.)?(((?P<tq>")?(?P<table_nameq>[^"]+)(?P=tq))|(?P<table_name>[_a-zA-Z0-9]+))'
         r'\s+DROP\s+COLUMN\s+'
         r'(((?P<cq>")?(?P<column_nameq>[^"]+)(?P=cq))|(?P<column_name>[^\s]+))'
+        r'(?P<rest>.*)$',
+        re.IGNORECASE | re.MULTILINE
+    )
+    _rename_column_re = re.compile(
+        r'^\s*ALTER\s+TABLE\s+'
+        r'(("?)public("?)\.)?(((?P<tq>")?(?P<table_nameq>[^"]+)(?P=tq))|(?P<table_name>[_a-zA-Z0-9]+))'
+        r'\s+RENAME\s+COLUMN\s+'
+        r'(((?P<cq>")?(?P<column_nameq>[^"]+)(?P=cq))|(?P<column_name>[^\s]+))'
+        r'\s+TO\s+'
+        r'(((?P<nq>")?(?P<ncolumn_nameq>[^"]+)(?P=nq))|(?P<ncolumn_name>[^\s]+))'
+        r'(?P<rest>.*)$',
+        re.IGNORECASE | re.MULTILINE
+    )
+    _rename_table_re = re.compile(
+        r'^\s*ALTER\s+TABLE\s+'
+        r'(("?)public("?)\.)?(((?P<tq>")?(?P<table_nameq>[^"]+)(?P=tq))|(?P<table_name>[_a-zA-Z0-9]+))'
+        r'\s+RENAME\s+TO\s+'
+        r'(((?P<nq>")?(?P<ntable_nameq>[^"]+)(?P=nq))|(?P<ntable_name>[^\s]+))'
         r'(?P<rest>.*)$',
         re.IGNORECASE | re.MULTILINE
     )

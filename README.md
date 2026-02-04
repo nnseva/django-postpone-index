@@ -56,6 +56,7 @@ The following complex use cases are processed by the package.
 - Back Migration. The both, forward and backward migrations are processed.
 - Implicit index drop while removing the table. The Django doesn't issue a separate SQL to drop indexes of the dropped table.
 - Implicit index drop while removing the field. The Django doesn't issue a separate SQL to drop indexes related to the dropped column.
+- Rename field (column) name or model (table) name
 
 ## Using
 

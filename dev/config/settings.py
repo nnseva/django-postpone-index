@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'config',
     'test_unique_together',
     'test_fields',
+    'test_fields_rename',
+    'test_model_rename',
     'test_explicit_constraint',
     'test_explicit_index',
     'test_ignore_migration',

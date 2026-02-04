@@ -11,7 +11,6 @@ class ModuleTest(base_tests.TestCase):
     __doc__ = __doc__
 
     module_name = __name__.split('.')[0]
-    migrations = ('0001', '0002', '0003')
 
     def test_004_migrate_with_bad_unique_data(self):
         """Test migrations step by step"""
